@@ -1,0 +1,137 @@
+---
+layout: post
+title: Simple group messenger/chat in Python
+tags:
+- socket
+- python
+---
+
+<p>
+  Aaaaannd here is another post of mine on sockets, client/server models and stuff. I suppose you have started to get bored by the same stuff everyday right? Seems like I just can't get enough of this thing. But trust me, I had no intention of doing this today, a friend of mine instigated me write a messenger for a project we were working on, and it turned out, writing this simple messaging program was more interesting than I thought.
+</p>
+<p>
+  So, instead of creating a straight forward chat program that was 'actually' required by my friend, I created this 'one-server-multiple-clients' program, which is more like the real world chat apps we use everyday.
+</p>
+<p>
+  To run the program, execute the 'server.py' (after changing the <b>bind() </b>address to the address of the server on which it is supposed to run). Then, execute the 'client.py' (guess what? same thing here. But you will have to add the <i>server address</i> in the <b>connect()</b> function here). Of course, you can have all of them running on the same system, but there ain't any fun in it, right?
+</p>
+<p>
+  Last but not the least, I have commented as much as I could, unlike my last article, so I expect everyone reading this, with a bit of programming knowledge, will understand this straight forward code.
+</p>
+<h4>server.py</h4>
+{% highlight python %}
+# Import the necessary libraries
+import socket
+import sys
+import select
+# Take message from an host and send it to all others
+def shout(sock, message):
+  for socket in LIST:
+    try:
+      # Don't send it back to server and yourself!
+      if socket != serv and socket != sock:
+        socket.send(message)
+    except:
+      # Assume client has got disconnected and remove it.
+      socket.close
+      LIST.remove(socket)
+# Declare variables required later.
+# To store list of sockets of clients as well as server itself.
+LIST = []
+# Common buffer for all purposes
+buff = 1024
+# Declaration of Server socket.
+serv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+serv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+serv.bind(("192.168.1.10", 1356))
+# Listen for upto 6 clients. Increase if you need more.
+serv.listen(6)
+# Add server socket to the LIST
+LIST.append(serv)
+while 1:
+  # Moniter clients all simultaneously
+  reads, writes, err = select.select(LIST, [], [])
+  for sock in reads:
+    # A new client connected?
+    if sock == serv:
+      sockfd, addr = serv.accept()
+      LIST.append(sockfd)
+    # Naah, just a new message!
+    else:
+      try:
+        # Get his shitty message.
+        data = sock.recv(buff)
+        if data:
+          # If he wrote something, send it to shout() function for broadcast.
+          shout(sock, data)
+      ;except:
+        # Shit just got real. Client kicked by server :3
+        sock.close()
+        LIST.remove(sock)
+        # Do this till the end of time.
+        continue
+serv.close()
+{% endhighlight %}
+
+<h4>client.py </h4>
+{% highlight python %}
+# Import the nessary libraries
+import socket
+import string
+import select
+import sys
+
+# Socket variable declaration
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.settimeout(2)
+
+# Connect to server. Change this for remote servers.
+s.connect(("192.168.1.10", 1356))
+
+# A prompt asking client to enter something.
+sys.stdout.write(">")
+sys.stdout.flush()
+
+while 1:
+  # These are the possible events.
+  # sys.stdin --> Client has typed something through keyboard.
+  # s --> Server has send a new message by some other client you.
+  streams = [sys.stdin, s]
+
+  # Moniter both the streams simultaneously for inputs.
+  readable, writable, err = select.select(streams, [], [])
+
+  # If server has sent something, readable will fill up.
+  for sock in readable:
+    if sock == s:
+
+      # Receive data in our variable. Check if it is empty.
+      data = sock.recv(1024)
+      if not data:
+        sys.exit()
+      else:
+
+        # Write data to stdout and give client prompt back.
+        sys.stdout.write(data)
+        sys.stdout.write(">")
+        sys.stdout.flush()
+
+    # No, its not the server. Our client has typed something in.
+    else:
+
+      # Read message. Send it to server. Give prompt back to client.
+      msg = sys.stdin.readline()
+      s.send(msg)
+      sys.stdout.write(">")
+      sys.stdout.flush()
+{% endhighlight %}
+
+<p>
+  So that was the code. Here is a glimpse of the output. The server is running off my 'raspberrypi' and all clients are running on my computer. Looks cool right?
+</p>
+
+<a href="http://3.bp.blogspot.com/-e7nPLz8ILWs/VIB4S6l4S6I/AAAAAAAAHuM/LTlZkmqdYX8/s1600/python_server.png"><img src="http://3.bp.blogspot.com/-e7nPLz8ILWs/VIB4S6l4S6I/AAAAAAAAHuM/LTlZkmqdYX8/s1600/python_server.png"/></a>
+
+<p>
+  If you look closely, one of the clients missed a message sent by another client, LOL, so that is normal. Any suggestions or edits or corrections, drop them in the comments below. :)
+</p>

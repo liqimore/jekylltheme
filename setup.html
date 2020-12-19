@@ -1,0 +1,185 @@
+---
+layout: page
+title: Setup
+---
+
+<h1>My gear</h1>
+<p>
+  This page is all about tech stuff that I own, fixing common problems in them, and if you should avoid any of them in case you're considering purchasing one of these. Unless otherwise mentioned, you can assume that I approve of the stuff on this page.
+</p>
+
+<h3>Computers</h3>
+<p>
+  My current work / hobby setup include a Lenovo Thinkpad T14 AMD from work and a <a href="/2020/04/thinkpad-x230-in-2020.html">Lenovo X230</a> that I bought off ebay-kleinanzeigen (a local ebay for private sales in Germany), both 16 gigs of RAM and 256 gigs of storage (The T14 is a much powerful with a 6 core AMD Ryzen Pro 5 cpu, full HD screen and NVMe SSD, but practically they're not very different). Both run Manjaro linux with KDE Plasma these days.
+</p>
+<p>
+  In the past, I owned a <a href="/2015/11/Fujitsu-Lifebook-A514-Review.html">Fujitsu Lifebook A514</a> and a <a href="/2018/05/lenovo-thinkpad-t440-ebay-refurbished-laptop-review.html">Lenovo Thinkpad T440</a>. My work computer was a <a href="/2019/03/experiences-with-macbook-and-macos.html">2017 Macbook Pro</a>.
+</p>
+
+<h3>Displays</h3>
+<p>
+  I have my work monitor, a Dell U2719D 27in 1440p IPS display and another monitor that I bought myself, a Dell P2419H 24in 1080p IPS display. I hardly use my X230 with my monitors, primarily because to use both the displays, I have to use the docking station.
+</p>
+
+<h3>Keyboard and mouse</h3>
+<p>
+  I absolutely love Thinkpad keyboards and the trackpoint, but I think while at home I prefer my external keyboard and mouse. The keyboard is an <a href="/2020/07/ikbc-mf108-v3-ansi-unboxing-review.html">IKBC MF108</a> mechanical keyboard with blue switches and the mouse is <a href="/2020/07/logitech-g305-gaming-mouse-review.html">Logitech G305</a> budget gaming mouse. Both sit on my CSL Titanwolf desk mat which I got just to copy all the r/battlestation posts on reddit.
+</p>
+
+<h3>Sound and music</h3>
+<p>
+  I bought a Tribit Maxboom bluetooth speaker shortly after coming to Germany. That's still my primary music source. For video calls and outdoors, I have cheap in ears called piston fit from a company called 1more.
+</p>
+
+<h3>Storage and backup</h3>
+<p>
+  I got myself a WD Elements 5 TB hard drive for backing up files. I also have a 500GB spinning disk hard drive from my <a href="/2015/11/Fujitsu-Lifebook-A514-Review.html">first laptop from 2015</a> and the 120 GB Transcend SSD that I bought along with the laptop, both in their own enclosures. I might install Windows 10 on the 120GB SSD and use it to play games, and keep the 500 GB one for automated computer backups.
+</p>
+
+<h3>Misc</h3>
+<p>
+  If you are looking for a nice watch, do give <a href="https://en.wikipedia.org/wiki/Casio_F-91W">Casio F-91W</a> a thought. Really love it! My primary way of reading has been on screens, either my phone or the Kindle. It certainly is a more useful gift that I've received.
+</p>
+
+<h1>Technical documentation (T14)</h1>
+<p>
+  Restart plasma if screen gets all messed up, store it as a alias
+</p>
+<pre>
+  kquitapp5 plasmashell && kstart5 plasmashell &
+</pre>
+<p>
+  Set charge threshhold in /etc/tlp.conf in START_CHARGE_THRESH_BAT0 and STOP_CHARGE_THRESH_BAT0
+</p>
+<p>
+  set 1080p resolution in kali https://unix.stackexchange.com/questions/227876/how-to-set-custom-resolution-using-xrandr-when-the-resolution-is-not-available-i
+</p>
+<h1>Technical documentation (x230)</h1>
+<h3>Logitech g305 mouse buttons bind to workspace shift right and left</h3>
+<p>First install xdotool</p>
+<pre>
+  # in .xbindkeysrc
+  "xdotool set_desktop --relative -- -1"
+  b:9
+
+  "xdotool set_desktop --relative 1"
+    b:8
+</pre>
+
+<h3>Bind thinkvantage to gnome-terminal</h3>
+<pre>gnome-terminal --window-with-profile=default</pre>
+
+<h3>Bind thinkvantage key to </h3>
+
+<h1>Technical documentation (T440, now sold, but kept here for anyone else's reference)</h1>
+<p>General notes on how to get up and running with my favourite tools real quick. Also documented here are the common issues that I've faced and their mitigations. Current setup is Thinkpad T440 running Arch and i3</p>
+
+<h3>Unresponsive touchpad after resuming from sleep</h3>
+<p>
+  Create a new file in <code>/lib/systemd/system-sleep/trackpad-restart.sh</code> and add the following to it. Make the file executable. It will run after each resume from suspend.
+</p>
+<pre>
+#!/bin/bash
+
+modprobe -r psmouse
+modprobe psmouse
+</pre>
+
+<h3>Sound and brightness function keys</h3>
+<p>
+  Install xbindkeys, create ~/.xbindkeysrc and do a <code>$ xbindkeys -d > ~/.xbindkeysrc</code>. Also put the following four lines in there.
+</p>
+<pre>
+
+# Increase volume
+"pactl set-sink-volume @DEFAULT_SINK@ +1000"
+   XF86AudioRaiseVolume
+
+# Decrease volume
+"pactl set-sink-volume @DEFAULT_SINK@ -1000"
+   XF86AudioLowerVolume
+
+# Mute volume
+"pactl set-sink-mute @DEFAULT_SINK@ toggle"
+   XF86AudioMute
+
+# Increase backlight
+"light -A 2"
+   XF86MonBrightnessUp
+
+# Decrease backlight
+"light -U 2"
+   XF86MonBrightnessDown
+</pre>
+
+<h3>Sync all terminal histories together</h3>
+<p>
+  <a href="https://unix.stackexchange.com/questions/1288/preserve-bash-hi
+</p>
+story-in-multiple-terminal-windows">https://unix.stackexchange.com/questions/1288/preserve-bash-history-in-multiple-terminal-windows</a>
+</p>
+
+<h3>Bash aliases</h3>
+<pre>
+alias gits="git status"
+alias gitch="git checkout"
+alias gitco="git commit -m"
+alias gita="git add"
+alias gitaa="git add ."
+alias gitph="git push"
+alias gitpl="git pull"
+alias gitpho="git push origin"
+alias gitplo="git pull origin"
+alias gitcp="git cherry-pick"
+alias bejs="bundle exec jekyll serve"
+alias bex="bundle exec"
+alias ls="exa"
+alias venv="source ./venv/bin/activate"
+</pre>
+
+<h1>Technical documentation (Fujitsu A514)</h1>
+<h3>Misty touchpad issue arch</h3>
+<p>
+  Set the following boot parameter: <code>i8042.noloop i8042.nomux i8042.nopnp i8042.reset</code>
+</p>
+
+<h3>Redshift</h3>
+<p>
+  Install redshift (comes with redshift-gtk). Enable redshift service and add redshift-gtk to ~/.xinitrc before dm startup. ~/.config/systemd/user/default.target.wants/redshift.service file to contain the following.
+</p>
+<pre>
+[Unit]
+Description=Redshift display colour temperature adjustment
+Documentation=http://jonls.dk/redshift/
+After=display-manager.service
+
+[Service]
+ExecStart=/usr/bin/redshift -l 52.52:13.37
+Environment=DISPLAY=:0
+Restart=always
+
+[Install]
+WantedBy=default.target
+</pre>
+<p>
+  The /etc/geoclue/geoclue.conf file to contain an additional section for redshift.
+</p>
+<pre>
+[redshift]
+allowed=true
+system=false
+users=
+</pre>
+
+<h3>KDEConnect</h3>
+<p>
+  On android just install the app. On desktop, install kdeconnect, and indicator-kdeconnect (aur) package. Add <code>indicator-kdeconnect &</code> to ~/.xinitrc.
+</p>
+
+<h3>Getting wifi to work</h3>
+<p>
+  Connect to lan and install wpa_supplicant. Use iw to search for wifi and then add in wpa_supplicant config the wifi username and password. This page has everything needed to get up and running with wireless: https://wiki.archlinux.org/index.php/Wireless_network_configuration#WPA2_Personal. Install networkmanager, enable and start networkmanager service. Install nm-applet and add <code>nm-applet &</code> to ~/.xinitrc.
+</p>
+
+<h3>Get git and other autocomplete</h3>
+<p>Install bash-autocomplete</p>
